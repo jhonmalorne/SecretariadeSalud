@@ -1,660 +1,1318 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Marketing Net - Sistema de Bodega</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>U.E. Batalla de Junín | Los Guayos, Carabobo</title>
+  <meta name="description" content="Unidad Educativa Batalla de Junín — Institución pública en Los Guayos, Carabobo. Formando ciudadanos con excelencia académica e innovación educativa.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <style>
+    /* ===== CSS VARIABLES ===== */
+    :root {
+      --navy:        #0D2B6B;
+      --navy-light:  #1a3d8a;
+      --navy-deep:   #09193F;
+      --gold:        #E8A020;
+      --gold-light:  #F5C060;
+      --gold-pale:   rgba(232,160,32,0.10);
+      --white:       #FFFFFF;
+      --off-white:   #F4F7FC;
+      --gray-100:    #EEF2F8;
+      --gray-200:    #D8E0EE;
+      --gray-500:    #7A8BA8;
+      --gray-700:    #3A4D6A;
+      --text:        #1A2744;
+      --green:       #1D8A5A;
+      --purple:      #7C3AED;
+      --red:         #C0392B;
+      --shadow:      0 4px 24px rgba(13,43,107,0.10);
+      --shadow-lg:   0 12px 48px rgba(13,43,107,0.16);
+      --radius:      14px;
+      --font:        'Plus Jakarta Sans', sans-serif;
+    }
 
-    <style>
-        :root { --primary-color: #0d6efd; --secondary-color: #6c757d; }
-        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .nexus-brand { font-weight: bold; color: var(--primary-color); }
-        .section-card { display: none; animation: fadeIn 0.4s; }
-        .section-card.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .currency-badge { font-size: 0.9em; font-weight: bold; }
-        .stock-warning { color: red; font-weight: bold; background-color: #ffe6e6; }
-        /* Ajuste para que el carrito siempre esté visible si es necesario */
-        .cart-sticky { position: sticky; top: 80px; }
-    </style>
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--white);
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+    img { max-width: 100%; display: block; }
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+
+    /* ===== UTILITY ===== */
+    .container { max-width: 1180px; margin: 0 auto; padding: 0 1.25rem; }
+
+    .section-label {
+      display: inline-block;
+      font-size: 0.71rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: var(--gold-pale);
+      border: 1px solid rgba(232,160,32,0.28);
+      border-radius: 50px;
+      padding: 0.3rem 0.9rem;
+      margin-bottom: 0.9rem;
+    }
+    .section-title {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1.18;
+      margin-bottom: 0.7rem;
+    }
+    .section-desc {
+      font-size: 1rem;
+      color: var(--gray-500);
+      max-width: 560px;
+      line-height: 1.75;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 1.75rem;
+      border-radius: 50px;
+      font-family: var(--font);
+      font-weight: 700;
+      font-size: 0.92rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      border: none;
+      line-height: 1;
+    }
+    .btn-primary { background: var(--gold); color: var(--navy); }
+    .btn-primary:hover {
+      background: var(--gold-light);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(232,160,32,0.38);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--white);
+      border: 2px solid rgba(255,255,255,0.45);
+    }
+    .btn-outline:hover {
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.8);
+    }
+
+    /* ===== NAVBAR ===== */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--gray-200);
+      transition: box-shadow 0.3s;
+    }
+    .navbar.scrolled { box-shadow: 0 2px 18px rgba(13,43,107,0.10); }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 68px;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+    .nav-brand-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--navy);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      color: var(--gold);
+      font-weight: 800;
+      flex-shrink: 0;
+      letter-spacing: -0.02em;
+    }
+    .nav-brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+    .nav-brand-text strong {
+      font-size: 0.87rem;
+      font-weight: 800;
+      color: var(--navy);
+    }
+    .nav-brand-text span {
+      font-size: 0.67rem;
+      color: var(--gray-500);
+      font-weight: 500;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 0.15rem;
+    }
+    .nav-links a {
+      font-size: 0.87rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      padding: 0.45rem 0.85rem;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    .nav-links a:hover { color: var(--navy); background: var(--gray-100); }
+    .nav-links .btn-cta {
+      background: var(--navy);
+      color: var(--white) !important;
+      padding: 0.48rem 1.1rem;
+      border-radius: 50px;
+      margin-left: 0.4rem;
+    }
+    .nav-links .btn-cta:hover { background: var(--navy-light) !important; }
+
+    /* Hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+      background: none;
+    }
+    .hamburger span {
+      display: block;
+      width: 24px;
+      height: 2.5px;
+      background: var(--navy);
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
+
+    .mobile-menu {
+      display: none;
+      flex-direction: column;
+      background: var(--white);
+      border-top: 1px solid var(--gray-100);
+      padding: 0.75rem 1.25rem 1.25rem;
+      gap: 0.2rem;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      padding: 0.7rem 0.9rem;
+      border-radius: 10px;
+      transition: background 0.2s;
+    }
+    .mobile-menu a:hover { background: var(--gray-100); color: var(--navy); }
+
+    /* ===== HERO ===== */
+    .hero {
+      position: relative;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      background: var(--navy);
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: url('https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1600&q=80') center/cover no-repeat;
+      opacity: 0.20;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(9,25,63,0.97) 0%,
+        rgba(13,43,107,0.82) 50%,
+        rgba(13,43,107,0.90) 100%
+      );
+    }
+    /* Decorative circle */
+    .hero-geo {
+      position: absolute;
+      right: -100px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 560px;
+      height: 560px;
+      border: 1.5px solid rgba(232,160,32,0.10);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .hero-geo::before {
+      content: '';
+      position: absolute;
+      inset: 44px;
+      border: 1.5px solid rgba(232,160,32,0.06);
+      border-radius: 50%;
+    }
+    .hero-geo::after {
+      content: '';
+      position: absolute;
+      inset: 88px;
+      border: 1.5px solid rgba(232,160,32,0.04);
+      border-radius: 50%;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      padding: 6rem 0 5rem;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: rgba(232,160,32,0.14);
+      border: 1px solid rgba(232,160,32,0.32);
+      color: var(--gold-light);
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 0.38rem 1rem;
+      border-radius: 50px;
+      margin-bottom: 1.4rem;
+      animation: fadeUp 0.8s ease both;
+    }
+    .hero-badge::before { content: '★'; }
+
+    .hero-title {
+      font-size: clamp(2.5rem, 7.5vw, 5.2rem);
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1.04;
+      letter-spacing: -0.02em;
+      animation: fadeUp 0.9s ease both;
+      animation-delay: 0.08s;
+    }
+    .hero-title span { color: var(--gold); display: block; }
+
+    .hero-subtitle {
+      font-size: clamp(0.98rem, 2.5vw, 1.2rem);
+      color: rgba(255,255,255,0.68);
+      max-width: 580px;
+      margin: 1.3rem 0 2.25rem;
+      font-weight: 400;
+      line-height: 1.78;
+      animation: fadeUp 1s ease both;
+      animation-delay: 0.16s;
+    }
+    .hero-subtitle em { color: var(--gold-light); font-style: normal; font-weight: 600; }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.9rem;
+      animation: fadeUp 1.1s ease both;
+      animation-delay: 0.24s;
+    }
+    .hero-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      margin-top: 3.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255,255,255,0.10);
+      animation: fadeUp 1.2s ease both;
+      animation-delay: 0.32s;
+    }
+    .hero-stat { display: flex; flex-direction: column; gap: 0.18rem; }
+    .hero-stat-num {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--gold);
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+    .hero-stat-label {
+      font-size: 0.76rem;
+      color: rgba(255,255,255,0.50);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(26px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== MARQUEE STRIP ===== */
+    .strip {
+      background: var(--gold);
+      overflow: hidden;
+      padding: 0.62rem 0;
+      white-space: nowrap;
+    }
+    .strip-track {
+      display: inline-flex;
+      gap: 0;
+      animation: marquee 32s linear infinite;
+    }
+    .strip-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      font-size: 0.81rem;
+      font-weight: 700;
+      color: var(--navy);
+      padding: 0 2.5rem;
+      letter-spacing: 0.04em;
+    }
+    .strip-item::before { content: '●'; opacity: 0.45; font-size: 0.5rem; }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ===== PHOTO STRIP ===== */
+    .photo-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      height: 210px;
+      overflow: hidden;
+    }
+    .photo-strip-item { overflow: hidden; }
+    .photo-strip-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.72) saturate(0.85);
+      transition: filter 0.45s ease, transform 0.45s ease;
+    }
+    .photo-strip-item:hover img { filter: brightness(0.88) saturate(1.1); transform: scale(1.04); }
+
+    /* ===== SECTIONS ===== */
+    .section { padding: 5.5rem 0; }
+    .section-alt { background: var(--off-white); }
+
+    .section-header { margin-bottom: 3rem; }
+    .section-header.centered { text-align: center; }
+    .section-header.centered .section-desc { margin: 0 auto; }
+
+    /* ===== LEVELS (ACADEMIC OFFER) ===== */
+    .levels-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.2rem;
+    }
+    .level-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 1.85rem 1.5rem 1.6rem;
+      border: 1px solid var(--gray-200);
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .level-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      border-radius: var(--radius) var(--radius) 0 0;
+      background: var(--ac);
+    }
+    .level-card:hover {
+      transform: translateY(-7px);
+      box-shadow: var(--shadow-lg);
+      border-color: transparent;
+    }
+    .level-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      background: var(--ac-pale);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.45rem;
+      margin-bottom: 1.1rem;
+    }
+    .level-card h3 {
+      font-size: 1.04rem;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 0.35rem;
+    }
+    .level-card p {
+      font-size: 0.83rem;
+      color: var(--gray-500);
+      line-height: 1.65;
+      margin-bottom: 1.1rem;
+    }
+    .level-list { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.15rem; }
+    .level-list-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.82rem;
+      color: var(--gray-700);
+    }
+    .level-list-check { font-size: 0.85rem; color: var(--ac); font-weight: 700; }
+    .level-badge {
+      display: inline-block;
+      font-size: 0.71rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 0.28rem 0.75rem;
+      border-radius: 50px;
+      background: var(--ac-pale);
+      color: var(--ac-text);
+    }
+    /* color themes per level */
+    .level-card.inicial    { --ac:#1D8A5A; --ac-pale:rgba(29,138,90,0.1);  --ac-text:#1D8A5A; }
+    .level-card.primaria   { --ac:#0D2B6B; --ac-pale:rgba(13,43,107,0.08); --ac-text:#0D2B6B; }
+    .level-card.media      { --ac:#E8A020; --ac-pale:rgba(232,160,32,0.1); --ac-text:#9a6a10; }
+    .level-card.bachillerato { --ac:#7C3AED; --ac-pale:rgba(124,58,237,0.08); --ac-text:#7C3AED; }
+
+    /* ===== VALUES ===== */
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+    .value-item { text-align: center; padding: 2rem 1rem; }
+    .value-icon { font-size: 2.4rem; margin-bottom: 1rem; }
+    .value-item h3 {
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 0.4rem;
+    }
+    .value-item p { font-size: 0.82rem; color: var(--gray-500); line-height: 1.65; }
+
+    /* ===== INNOVATION ===== */
+    .innovation-section {
+      background: var(--navy);
+      padding: 5.5rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .innovation-section::before {
+      content: '';
+      position: absolute;
+      right: -160px; top: -160px;
+      width: 520px; height: 520px;
+      background: radial-gradient(circle, rgba(232,160,32,0.07) 0%, transparent 68%);
+      pointer-events: none;
+    }
+    .innovation-section::after {
+      content: '';
+      position: absolute;
+      left: -100px; bottom: -100px;
+      width: 380px; height: 380px;
+      background: radial-gradient(circle, rgba(29,138,90,0.06) 0%, transparent 68%);
+      pointer-events: none;
+    }
+    .innovation-section .section-label {
+      color: var(--gold-light);
+      background: rgba(232,160,32,0.12);
+      border-color: rgba(232,160,32,0.25);
+    }
+    .innovation-section .section-title { color: var(--white); }
+    .innovation-section .section-desc  { color: rgba(255,255,255,0.58); }
+
+    .innov-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 1.2rem;
+      margin-top: 2.75rem;
+      position: relative;
+      z-index: 1;
+    }
+    .innov-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: var(--radius);
+      padding: 2rem 1.75rem;
+      transition: all 0.3s ease;
+    }
+    .innov-card:hover {
+      background: rgba(255,255,255,0.09);
+      border-color: rgba(232,160,32,0.30);
+      transform: translateY(-5px);
+    }
+    .innov-emoji { font-size: 2.1rem; margin-bottom: 1.1rem; display: block; }
+    .innov-card h3 {
+      font-size: 1.08rem;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 0.6rem;
+    }
+    .innov-card p {
+      font-size: 0.86rem;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.72;
+      margin-bottom: 1.25rem;
+    }
+    .innov-tag {
+      display: inline-block;
+      font-size: 0.69rem;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid rgba(232,160,32,0.32);
+      padding: 0.26rem 0.7rem;
+      border-radius: 50px;
+    }
+    .innov-partners {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.9rem;
+    }
+    .innov-partner {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.72);
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 0.28rem 0.65rem;
+      border-radius: 6px;
+    }
+
+    /* ===== BULLETIN ===== */
+    .bulletin-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
+      gap: 1.15rem;
+      margin-top: 2.75rem;
+    }
+    .bul-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      border: 1px solid var(--gray-200);
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .bul-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
+    .bul-head {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.6rem 1rem;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .bul-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .bul-type {
+      font-size: 0.69rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gray-500);
+    }
+    .bul-date { margin-left: auto; font-size: 0.69rem; color: var(--gray-500); }
+    .bul-body { padding: 1.2rem 1rem; }
+    .bul-body h4 {
+      font-size: 0.94rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 0.42rem;
+      line-height: 1.35;
+    }
+    .bul-body p { font-size: 0.81rem; color: var(--gray-500); line-height: 1.65; }
+
+    .bulletin-note {
+      text-align: center;
+      margin-top: 2.5rem;
+      padding: 2rem;
+      background: var(--gray-100);
+      border-radius: var(--radius);
+      border: 2px dashed var(--gray-200);
+    }
+    .bulletin-note p { font-size: 0.86rem; color: var(--gray-500); margin-bottom: 0.2rem; }
+    .bulletin-note strong { font-size: 0.98rem; color: var(--navy); }
+
+    /* ===== FOOTER ===== */
+    .footer { background: var(--navy-deep); color: rgba(255,255,255,0.50); }
+    .footer-main {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr 1fr 1.2fr;
+      gap: 3rem;
+      padding: 3.75rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .footer-brand h2 {
+      font-size: 1.08rem;
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1.3;
+      margin-bottom: 0.7rem;
+    }
+    .footer-brand p {
+      font-size: 0.82rem;
+      line-height: 1.72;
+      margin-bottom: 1.2rem;
+    }
+    .footer-accred {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(232,160,32,0.10);
+      border: 1px solid rgba(232,160,32,0.22);
+      border-radius: 50px;
+      padding: 0.32rem 0.85rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--gold-light);
+    }
+    .footer-col h4 {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 1.1rem;
+    }
+    .footer-col ul li { margin-bottom: 0.5rem; }
+    .footer-col ul li a,
+    .footer-col ul li span {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.48);
+      transition: color 0.2s;
+    }
+    .footer-col ul li a:hover { color: var(--gold-light); }
+    .footer-contact-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.55rem;
+      margin-bottom: 0.65rem;
+    }
+    .fc-icon { font-size: 0.95rem; flex-shrink: 0; margin-top: 0.06rem; }
+    .fc-text { font-size: 0.81rem; color: rgba(255,255,255,0.48); line-height: 1.5; }
+
+    /* CREDIT */
+    .footer-credit {
+      padding: 2.25rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.1rem;
+      text-align: center;
+    }
+    .credit-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 1.1rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.11);
+      border-radius: 16px;
+      padding: 1rem 1.5rem;
+      max-width: 560px;
+      width: 100%;
+      transition: background 0.25s;
+    }
+    .credit-card:hover { background: rgba(255,255,255,0.08); }
+    .credit-logo-wrap {
+      width: 54px;
+      height: 54px;
+      background: var(--white);
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .credit-logo-wrap img { width: 100%; height: 100%; object-fit: contain; }
+    .credit-logo-fallback {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: var(--navy);
+      text-align: center;
+      line-height: 1.25;
+    }
+    .credit-text { text-align: left; }
+    .credit-text strong {
+      display: block;
+      font-size: 0.86rem;
+      font-weight: 800;
+      color: var(--gold-light);
+      line-height: 1.4;
+      margin-bottom: 0.28rem;
+    }
+    .credit-text p { font-size: 0.77rem; color: rgba(255,255,255,0.44); line-height: 1.55; }
+    .credit-text a { color: var(--gold-light); font-weight: 700; }
+    .credit-text a:hover { text-decoration: underline; }
+    .footer-copy { font-size: 0.72rem; color: rgba(255,255,255,0.25); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 960px) {
+      .footer-main { grid-template-columns: 1fr 1fr; gap: 2rem; }
+      .footer-brand { grid-column: 1 / -1; }
+      .photo-strip { grid-template-columns: repeat(2, 1fr); height: 260px; }
+    }
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .hero-title { font-size: 2.25rem; }
+      .hero-stats { gap: 1.3rem; }
+      .footer-main { grid-template-columns: 1fr; gap: 1.5rem; }
+      .photo-strip { grid-template-columns: repeat(2, 1fr); height: 200px; }
+      .credit-card { flex-direction: column; align-items: center; }
+      .credit-text { text-align: center; }
+    }
+    @media (max-width: 400px) {
+      .hero-stats { flex-direction: column; gap: 0.9rem; }
+    }
+  </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-        <div class="container-fluid">
-            <a class="navbar-brand nexus-brand" href="#">
-                <i class="bi bi-box-seam"></i> Nexus Marketing Net
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link active" href="#" onclick="showSection('pos')"><i class="bi bi-cart"></i> Ventas</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('inventory')"><i class="bi bi-boxes"></i> Almacén</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('credits')"><i class="bi bi-people"></i> Fiados</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('admin')"><i class="bi bi-file-earmark-spreadsheet"></i> Cierre/Reportes</a></li>
-                </ul>
-                <div class="d-flex flex-column align-items-end text-white">
-                    <span id="tasa-display" class="badge bg-secondary fs-6">Cargando Tasa...</span>
-                    <span class="small" style="font-size: 0.75rem;">Soporte: 0424-4525765</span>
-                </div>
-            </div>
+<!-- ════════════════════════════════ NAVBAR ════════════════════════════════ -->
+<nav class="navbar" id="navbar">
+  <div class="container">
+    <div class="nav-inner">
+
+      <a href="#inicio" class="nav-brand" aria-label="Inicio — U.E. Batalla de Junín">
+        <div class="nav-brand-icon">BJ</div>
+        <div class="nav-brand-text">
+          <strong>U.E. Batalla de Junín</strong>
+          <span>Los Guayos, Carabobo · Est. 1978</span>
         </div>
-    </nav>
+      </a>
 
-    <div class="container mt-4">
-        
-        <div id="pos" class="section-card active">
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="card shadow-sm border-0">
-                        <div class="card-header bg-primary text-white d-flex justify-content-between">
-                            <span><i class="bi bi-grid-3x3-gap"></i> Catálogo de Productos</span>
-                            <small id="last-update-api"></small>
-                        </div>
-                        <div class="card-body">
-                            <div class="input-group mb-3">
-                                <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                <input type="text" id="searchProduct" class="form-control" placeholder="Buscar por nombre..." onkeyup="renderCatalog()">
-                            </div>
-                            <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
-                                <table class="table table-hover align-middle">
-                                    <thead class="table-light"><tr><th>Producto</th><th>Stock</th><th>Precio $</th><th>Precio Bs</th><th>Agregar</th></tr></thead>
-                                    <tbody id="catalog-body"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card shadow border-0 cart-sticky">
-                        <div class="card-header bg-success text-white"><i class="bi bi-cart4"></i> Carrito de Compra</div>
-                        <div class="card-body p-2">
-                            <ul id="cart-list" class="list-group list-group-flush mb-3" style="max-height: 250px; overflow-y: auto;"></ul>
-                            
-                            <div class="bg-light p-3 rounded mb-3">
-                                <h4 class="d-flex justify-content-between fw-bold"><span>Total:</span> <span id="cart-total">$0.00</span></h4>
-                                <h5 class="text-end text-primary" id="cart-total-bs">Bs 0.00</h5>
-                            </div>
+      <ul class="nav-links" role="list">
+        <li><a href="#oferta">Oferta Académica</a></li>
+        <li><a href="#innovacion">Innovación</a></li>
+        <li><a href="#cartelera">Cartelera</a></li>
+        <li><a href="#contacto" class="btn-cta">Contacto</a></li>
+      </ul>
 
-                            <form id="sale-form">
-                                <div class="mb-2">
-                                    <input type="text" class="form-control form-control-sm" id="clientName" placeholder="Nombre Cliente (Opcional)">
-                                </div>
-                                <div class="mb-2">
-                                    <input type="tel" class="form-control form-control-sm" id="clientPhone" placeholder="Teléfono (Opcional)">
-                                </div>
-                                <select class="form-select mb-3" id="paymentMethod" required onchange="toggleCreditWarning()">
-                                    <option value="Efectivo" selected>Efectivo</option>
-                                    <option value="Pago Movil">Pago Móvil</option>
-                                    <option value="Divisas USD">Divisas USD</option>
-                                    <option value="Biopago">Biopago</option>
-                                    <option value="Transferencia">Transferencia</option>
-                                    <option value="Fiado">⚠️ FIADO (Crédito)</option>
-                                </select>
-                                <button type="button" class="btn btn-success w-100 py-2 fw-bold" onclick="processSale()">
-                                    <i class="bi bi-check-circle"></i> COBRAR
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      <button class="hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobile-menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobile-menu" role="navigation" aria-label="Menú móvil">
+    <a href="#inicio"     onclick="closeMenu()">🏠 Inicio</a>
+    <a href="#oferta"     onclick="closeMenu()">📚 Oferta Académica</a>
+    <a href="#innovacion" onclick="closeMenu()">💡 Innovación y Alianzas</a>
+    <a href="#cartelera"  onclick="closeMenu()">📋 Cartelera</a>
+    <a href="#contacto"   onclick="closeMenu()">📞 Contacto</a>
+  </div>
+</nav>
+
+<!-- ════════════════════════════════ HERO ════════════════════════════════ -->
+<section class="hero" id="inicio" aria-label="Portada principal">
+  <div class="hero-bg" role="presentation"></div>
+  <div class="hero-overlay" role="presentation"></div>
+  <div class="hero-geo"    role="presentation"></div>
+
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-badge">Municipio Los Guayos · Estado Carabobo</div>
+      <h1 class="hero-title">
+        U.E. Batalla<br><span>de Junín</span>
+      </h1>
+      <p class="hero-subtitle">
+        Formando las ciudadanas y los ciudadanos que <em>transformarán nuestro municipio</em>.
+        Una institución comprometida con la excelencia académica, la innovación educativa
+        y el bienestar integral de toda nuestra comunidad.
+      </p>
+      <div class="hero-actions">
+        <a href="#oferta" class="btn btn-primary">📚 Conoce nuestra gestión</a>
+        <a href="#innovacion" class="btn btn-outline">Ver programas →</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-num">+800</span>
+          <span class="hero-stat-label">Estudiantes activos</span>
         </div>
-
-        <div id="inventory" class="section-card">
-            <div class="card shadow-sm mb-4 border-0">
-                <div class="card-header bg-secondary text-white"><i class="bi bi-clipboard-data"></i> Gestión de Stock</div>
-                <div class="card-body">
-                    <form id="inventory-form" class="row g-2 align-items-end">
-                        <div class="col-md-3">
-                            <label class="small">Nombre Producto</label>
-                            <input type="text" class="form-control" id="inv-product" required>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="small">Precio Unit. ($)</label>
-                            <input type="number" class="form-control" id="inv-price" step="0.01" required>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="small">Característica (ej: Grande)</label>
-                            <input type="text" class="form-control" id="inv-char">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="small">Cantidad</label>
-                            <input type="number" class="form-control" id="inv-qty" required>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="small">Responsable</label>
-                            <input type="text" class="form-control" id="inv-resp" required>
-                        </div>
-                        <div class="col-md-12 text-end mt-3">
-                             <button type="button" class="btn btn-outline-danger me-2" onclick="updateStock('egreso')"><i class="bi bi-dash-circle"></i> Retirar/Pérdida</button>
-                             <button type="button" class="btn btn-primary" onclick="updateStock('ingreso')"><i class="bi bi-plus-circle"></i> Ingresar Mercancía</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            
-            <h5 class="mt-4 text-secondary">Historial de Movimientos</h5>
-            <div class="table-responsive bg-white shadow-sm rounded">
-                <table class="table table-striped table-hover mb-0" id="movements-table">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Hora</th>
-                            <th>Responsable</th>
-                            <th>Tipo</th>
-                            <th>Cant.</th>
-                            <th>Producto</th>
-                        </tr>
-                    </thead>
-                    <tbody id="movements-body"></tbody>
-                </table>
-            </div>
+        <div class="hero-stat">
+          <span class="hero-stat-num">4</span>
+          <span class="hero-stat-label">Niveles educativos</span>
         </div>
-
-        <div id="credits" class="section-card">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h3 class="text-primary"><i class="bi bi-notebook"></i> Cuentas por Cobrar</h3>
-                <button class="btn btn-success" onclick="exportTableToExcel('credits-table', 'Reporte_Fiados')"><i class="bi bi-file-excel"></i> Descargar Excel</button>
-            </div>
-            <div class="table-responsive bg-white shadow-sm rounded">
-                <table class="table table-bordered table-hover mb-0" id="credits-table">
-                    <thead class="bg-warning text-dark">
-                        <tr>
-                            <th>Deudor</th>
-                            <th>Teléfono</th>
-                            <th>Producto</th>
-                            <th>Deuda ($)</th>
-                            <th>Deuda (Bs Hoy)</th>
-                            <th>Estado</th>
-                            <th>Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody id="credits-body"></tbody>
-                </table>
-            </div>
+        <div class="hero-stat">
+          <span class="hero-stat-num">3</span>
+          <span class="hero-stat-label">Alianzas universitarias</span>
         </div>
-
-        <div id="admin" class="section-card">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="card text-center mb-4 border-danger shadow-sm">
-                        <div class="card-header bg-danger text-white fw-bold">CIERRE DE CAJA</div>
-                        <div class="card-body">
-                            <p class="text-muted">Al cerrar caja, las ventas se exportan a Excel y el contador se reinicia a cero.</p>
-                            <input type="text" id="close-resp" class="form-control mb-3" placeholder="Nombre del Responsable">
-                            <button class="btn btn-danger w-100" onclick="closeRegister()"><i class="bi bi-lock-fill"></i> CERRAR TURNO</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card mb-4 shadow-sm">
-                        <div class="card-header bg-dark text-white">Reportes</div>
-                        <div class="card-body d-grid gap-2">
-                            <button class="btn btn-outline-primary" onclick="exportSales()"><i class="bi bi-download"></i> Descargar Ventas de Hoy</button>
-                            <button class="btn btn-outline-secondary" onclick="exportInventory()"><i class="bi bi-box-seam"></i> Descargar Inventario Total</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <h5 class="text-secondary">Registro de Ventas (Turno Actual)</h5>
-            <div class="table-responsive bg-white shadow-sm rounded">
-                <table class="table table-sm table-hover mb-0" id="sales-table">
-                    <thead class="table-light">
-                        <tr><th>Hora</th><th>Vendedor</th><th>Detalle</th><th>Cliente</th><th>Método</th><th>Total $</th></tr>
-                    </thead>
-                    <tbody id="sales-body"></tbody>
-                </table>
-            </div>
+        <div class="hero-stat">
+          <span class="hero-stat-num">45+</span>
+          <span class="hero-stat-label">Años de servicio</span>
         </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE STRIP -->
+<div class="strip" aria-label="Avisos institucionales" role="marquee">
+  <div class="strip-track" id="stripTrack">
+    <span class="strip-item">📌 Inscripciones 2025–2026 abiertas — Consulta los requisitos en Secretaría</span>
+    <span class="strip-item">🏛️ Alianzas activas: UJAP · CUAM · UAM — Servicios comunitarios disponibles</span>
+    <span class="strip-item">📚 Biblioteca Comunitaria operativa — Lun a Vie 7:00 am – 12:00 m</span>
+    <span class="strip-item">🎓 Actos de Grado Julio 2025 — Confirma tu asistencia con tu docente</span>
+    <span class="strip-item">📌 Inscripciones 2025–2026 abiertas — Consulta los requisitos en Secretaría</span>
+    <span class="strip-item">🏛️ Alianzas activas: UJAP · CUAM · UAM — Servicios comunitarios disponibles</span>
+    <span class="strip-item">📚 Biblioteca Comunitaria operativa — Lun a Vie 7:00 am – 12:00 m</span>
+    <span class="strip-item">🎓 Actos de Grado Julio 2025 — Confirma tu asistencia con tu docente</span>
+  </div>
+</div>
+
+<!-- PHOTO STRIP -->
+<div class="photo-strip" role="presentation" aria-hidden="true">
+  <div class="photo-strip-item">
+    <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?w=600&q=80" alt="Estudiantes en clases">
+  </div>
+  <div class="photo-strip-item">
+    <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&q=80" alt="Biblioteca escolar">
+  </div>
+  <div class="photo-strip-item">
+    <img src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=600&q=80" alt="Estudiantes leyendo">
+  </div>
+  <div class="photo-strip-item">
+    <img src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=600&q=80" alt="Aula de clases">
+  </div>
+</div>
+
+<!-- ════════════════════════════════ OFERTA ACADÉMICA ════════════════════ -->
+<section class="section" id="oferta" aria-labelledby="oferta-title">
+  <div class="container">
+    <div class="section-header centered">
+      <div class="section-label">Oferta Académica</div>
+      <h2 class="section-title" id="oferta-title">Una educación integral<br>para cada etapa de vida</h2>
+      <p class="section-desc">
+        Desde los primeros años hasta el egreso bachiller, acompañamos a cada estudiante
+        con docentes comprometidos y una visión pedagógica moderna, humanista e inclusiva.
+      </p>
+    </div>
+
+    <div class="levels-grid">
+
+      <!-- INICIAL -->
+      <article class="level-card inicial">
+        <div class="level-icon">🌱</div>
+        <h3>Educación Inicial</h3>
+        <p>Estimulación temprana, desarrollo socioafectivo y habilidades cognitivas en un entorno seguro, lúdico y amoroso.</p>
+        <div class="level-list">
+          <div class="level-list-item"><span class="level-list-check">✓</span> Maternal (2–3 años)</div>
+          <div class="level-list-item"><span class="level-list-check">✓</span> Preescolar I (3–4 años)</div>
+          <div class="level-list-item"><span class="level-list-check">✓</span> Preescolar II (4–6 años)</div>
+        </div>
+        <span class="level-badge">3 niveles</span>
+      </article>
+
+      <!-- PRIMARIA -->
+      <article class="level-card primaria">
+        <div class="level-icon">📖</div>
+        <h3>Educación Primaria</h3>
+        <p>Construcción de saberes fundamentales, convivencia ciudadana y desarrollo del pensamiento crítico y creativo.</p>
+        <div class="level-list">
+          <div class="level-list-item"><span class="level-list-check">✓</span> 1° al 3° Grado — Ciclo I</div>
+          <div class="level-list-item"><span class="level-list-check">✓</span> 4° al 6° Grado — Ciclo II</div>
+          <div class="level-list-item"><span class="level-list-check">✓</span> Programa de lectura activa</div>
+        </div>
+        <span class="level-badge">6 grados</span>
+      </article>
+
+      <!-- MEDIA GENERAL -->
+      <article class="level-card media">
+        <div class="level-icon">🔬</div>
+        <h3>Media General</h3>
+        <p>Consolidación del conocimiento científico, humanístico y técnico con énfasis en el pensamiento analítico y la conciencia social.</p>
+        <div class="level-list">
+          <div class="level-list-item"><span class="level-list-check">✓</span> 1° Año — Ciencias Básicas</div>
+          <div class="level-list-item"><span class="level-list-check">✓</span> 2° Año — Ciencias Sociales</div>
+          <div class="level-list-item"><span class="level-list-check">✓</span> 3° Año — Integración Académica</div>
+        </div>
+        <span class="level-badge">3 años</span>
+      </article>
+
+      <!-- BACHILLERATO -->
+      <article class="level-card bachillerato">
+        <div class="level-icon">🎓</div>
+        <h3>Bachillerato</h3>
+        <p>Preparación sólida para la educación superior con proyectos de investigación, liderazgo y desarrollo de vocación profesional.</p>
+        <div class="level-list">
+          <div class="level-list-item"><span class="level-list-check">✓</span> 4° Año — Ciencias y Letras</div>
+          <div class="level-list-item"><span class="level-list-check">✓</span> 5° Año — Proyecto de Grado</div>
+          <div class="level-list-item"><span class="level-list-check">✓</span> Orientación universitaria</div>
+        </div>
+        <span class="level-badge">2 años</span>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ VALORES ════════════════════════════════ -->
+<section class="section section-alt" aria-labelledby="valores-title">
+  <div class="container">
+    <div class="section-header centered">
+      <div class="section-label">Nuestra Identidad</div>
+      <h2 class="section-title" id="valores-title">Los pilares que nos guían</h2>
+    </div>
+    <div class="values-grid">
+      <div class="value-item">
+        <div class="value-icon">🤝</div>
+        <h3>Comunidad</h3>
+        <p>La escuela como centro de encuentro, diálogo y crecimiento colectivo para toda nuestra parroquia.</p>
+      </div>
+      <div class="value-item">
+        <div class="value-icon">⭐</div>
+        <h3>Excelencia</h3>
+        <p>Compromiso con la calidad académica, la actualización docente continua y la mejora permanente.</p>
+      </div>
+      <div class="value-item">
+        <div class="value-icon">💡</div>
+        <h3>Innovación</h3>
+        <p>Apertura a nuevas metodologías, herramientas digitales y alianzas que enriquecen el aprendizaje.</p>
+      </div>
+      <div class="value-item">
+        <div class="value-icon">🌿</div>
+        <h3>Dignidad</h3>
+        <p>Respeto irrestricto a la diversidad, la identidad y los derechos de cada miembro de nuestra comunidad.</p>
+      </div>
+      <div class="value-item">
+        <div class="value-icon">📋</div>
+        <h3>Orden y Gestión</h3>
+        <p>Planificación estratégica y administración responsable como garantía del buen funcionamiento institucional.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ INNOVACIÓN ════════════════════════════ -->
+<section class="innovation-section" id="innovacion" aria-labelledby="innov-title">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Innovación y Alianzas</div>
+      <h2 class="section-title" id="innov-title">Programas estratégicos que<br>abren nuevos horizontes</h2>
+      <p class="section-desc">
+        Construimos puentes entre la escuela, la comunidad y la educación superior.
+        Nuestros programas de vanguardia garantizan oportunidades reales y concretas
+        para el desarrollo integral de nuestros estudiantes y sus familias.
+      </p>
+    </div>
+
+    <div class="innov-grid">
+
+      <article class="innov-card">
+        <span class="innov-emoji">📚</span>
+        <h3>Bibliotecas Comunitarias</h3>
+        <p>
+          Espacios de lectura, consulta e innovación abiertos a toda la comunidad.
+          Fomentamos la cultura del conocimiento como herramienta de transformación
+          social, con acceso libre, organizado y enriquecedor para niños, jóvenes y familias de Los Guayos.
+        </p>
+        <span class="innov-tag">Abierto a la comunidad</span>
+      </article>
+
+      <article class="innov-card">
+        <span class="innov-emoji">🏛️</span>
+        <h3>Alianzas Universitarias</h3>
+        <p>
+          Integramos servicios comunitarios de las principales casas de estudio de la región
+          para fortalecer la formación de nuestros bachilleres y ofrecer acompañamiento
+          profesional en áreas de salud, orientación y asesoría jurídica a padres y docentes.
+        </p>
+        <span class="innov-tag">3 universidades aliadas</span>
+        <div class="innov-partners">
+          <span class="innov-partner">UJAP</span>
+          <span class="innov-partner">CUAM</span>
+          <span class="innov-partner">UAM</span>
+        </div>
+      </article>
+
+      <article class="innov-card">
+        <span class="innov-emoji">💻</span>
+        <h3>Gestión Digital Escolar</h3>
+        <p>
+          Implementamos herramientas digitales modernas para la comunicación oportuna
+          con representantes, la administración académica y la difusión de información
+          institucional de forma ordenada, clara y eficiente.
+        </p>
+        <span class="innov-tag">Comunicación efectiva</span>
+      </article>
+
+      <article class="innov-card">
+        <span class="innov-emoji">🌱</span>
+        <h3>Proyectos Sociocomunitarios</h3>
+        <p>
+          Nuestros bachilleres desarrollan proyectos de impacto real aplicando los saberes
+          adquiridos, formando su conciencia ciudadana y dejando una huella positiva
+          en el municipio desde el aula hasta la acción comunitaria.
+        </p>
+        <span class="innov-tag">Impacto comunitario</span>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ CARTELERA ════════════════════════════ -->
+<section class="section" id="cartelera" aria-labelledby="cartelera-title">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Cartelera Informativa Digital</div>
+      <h2 class="section-title" id="cartelera-title">Mantente al día con<br>nuestra comunidad</h2>
+      <p class="section-desc">
+        Publicamos de forma oportuna inscripciones, cronogramas, eventos y toda la
+        información relevante para nuestra comunidad educativa. La información clara
+        es señal de una gestión comprometida.
+      </p>
+    </div>
+
+    <div class="bulletin-grid">
+
+      <article class="bul-card">
+        <div class="bul-head">
+          <div class="bul-dot" style="background:#1D8A5A;"></div>
+          <span class="bul-type">Inscripciones</span>
+          <span class="bul-date">May 2025</span>
+        </div>
+        <div class="bul-body">
+          <h4>Inscripciones Año Escolar 2025–2026</h4>
+          <p>Proceso abierto para todos los niveles. Se reciben recaudos en Secretaría de lunes a viernes de 7:00 am a 12:00 m. Lleva fotocopia de partida de nacimiento y carnet de vacunas.</p>
+        </div>
+      </article>
+
+      <article class="bul-card">
+        <div class="bul-head">
+          <div class="bul-dot" style="background:#E8A020;"></div>
+          <span class="bul-type">Cronograma</span>
+          <span class="bul-date">Jun 2025</span>
+        </div>
+        <div class="bul-body">
+          <h4>Evaluaciones — Tercer Lapso</h4>
+          <p>El calendario de evaluaciones del tercer lapso ha sido distribuido. Consulta a tu docente de aula para conocer las fechas específicas por área y materia.</p>
+        </div>
+      </article>
+
+      <article class="bul-card">
+        <div class="bul-head">
+          <div class="bul-dot" style="background:#7C3AED;"></div>
+          <span class="bul-type">Graduación</span>
+          <span class="bul-date">Jul 2025</span>
+        </div>
+        <div class="bul-body">
+          <h4>Acto de Grado — Promoción 2025</h4>
+          <p>Nuestra promoción de bachilleres 2025 celebrará su acto de grado en la primera semana de julio. Detalles de lugar y hora serán confirmados próximamente.</p>
+        </div>
+      </article>
+
+      <article class="bul-card">
+        <div class="bul-head">
+          <div class="bul-dot" style="background:#0D2B6B;"></div>
+          <span class="bul-type">Biblioteca</span>
+          <span class="bul-date">Permanente</span>
+        </div>
+        <div class="bul-body">
+          <h4>Biblioteca Comunitaria: Horario Extendido</h4>
+          <p>Abierta a estudiantes, representantes y comunidad en general de lunes a viernes, de 7:00 am a 12:00 m. Préstamos, consultas y actividades de fomento lector.</p>
+        </div>
+      </article>
+
+      <article class="bul-card">
+        <div class="bul-head">
+          <div class="bul-dot" style="background:#C0392B;"></div>
+          <span class="bul-type">Reunión</span>
+          <span class="bul-date">Próximo</span>
+        </div>
+        <div class="bul-body">
+          <h4>Reunión de Padres y Representantes</h4>
+          <p>Se convoca a todos los representantes a la entrega de boletas del tercer lapso. Fecha y hora serán notificadas por los docentes de cada sección.</p>
+        </div>
+      </article>
+
+      <article class="bul-card">
+        <div class="bul-head">
+          <div class="bul-dot" style="background:#1D8A5A;"></div>
+          <span class="bul-type">Alianzas</span>
+          <span class="bul-date">2025</span>
+        </div>
+        <div class="bul-body">
+          <h4>Servicios Comunitarios Universitarios</h4>
+          <p>Estudiantes de UJAP, CUAM y UAM ofrecen servicios de orientación vocacional, salud preventiva y asesoría jurídica gratuita en nuestra institución.</p>
+        </div>
+      </article>
 
     </div>
 
-    <script>
-        // --- 1. GESTIÓN DE ESTADO (BASE DE DATOS LOCAL) ---
-        let products = JSON.parse(localStorage.getItem('nexus_products')) || [];
-        let movements = JSON.parse(localStorage.getItem('nexus_movements')) || [];
-        let sales = JSON.parse(localStorage.getItem('nexus_sales')) || [];
-        let credits = JSON.parse(localStorage.getItem('nexus_credits')) || [];
-        let cart = [];
-        let dollarRate = 0; // Se llenará con la API
+    <div class="bulletin-note">
+      <p>¿Tienes alguna duda o consulta?</p>
+      <strong>Visítanos o contáctanos directamente — siempre disponibles para nuestra comunidad. 📞</strong>
+    </div>
+  </div>
+</section>
 
-        // --- 2. INICIALIZACIÓN ---
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Intentar cargar tasa inmediatamente
-            await fetchDollarRate();
-            
-            // Renderizar datos guardados
-            renderCatalog();
-            renderMovements();
-            renderCredits();
-            renderSalesTable();
-            
-            // Actualizar tasa cada 5 minutos automáticamente
-            setInterval(fetchDollarRate, 300000);
-        });
+<!-- ════════════════════════════════ FOOTER ════════════════════════════════ -->
+<footer class="footer" id="contacto">
+  <div class="container">
+    <div class="footer-main">
 
-        // --- 3. API DOLAR VENEZUELA (CORREGIDA Y ROBUSTA) ---
-        async function fetchDollarRate() {
-            const display = document.getElementById('tasa-display');
-            
-            try {
-                display.innerText = "⏳ Buscando Tasa...";
-                
-                // Intento 1: DolarApi.com (Endpoint Oficial)
-                const response = await fetch('https://ve.dolarapi.com/v1/dolares/oficial');
-                if (!response.ok) throw new Error('Error de conexión');
-                
-                const data = await response.json();
-                
-                if (data && data.promedio) {
-                    dollarRate = parseFloat(data.promedio);
-                    display.className = "badge bg-success fs-6"; // Verde si hay éxito
-                    display.innerText = `BCV: Bs ${dollarRate.toFixed(2)}`;
-                } else {
-                    throw new Error('Datos vacíos');
-                }
+      <!-- BRAND -->
+      <div class="footer-brand">
+        <h2>U.E. Batalla de Junín</h2>
+        <p>
+          Institución pública comprometida con la formación integral de ciudadanos libres, críticos
+          y capaces de transformar positivamente su entorno. Desde 1978, sembrando futuro en Los Guayos.
+        </p>
+        <span class="footer-accred">⭐ Acreditada por el MPPE</span>
+      </div>
 
-            } catch (error) {
-                console.warn("Fallo API Automática, pidiendo manual...", error);
-                
-                // Si la API falla, usamos el valor que ya teníamos o pedimos manual
-                if (dollarRate === 0) {
-                    display.className = "badge bg-danger fs-6";
-                    display.innerText = "⚠️ Error API";
-                    
-                    const manualRate = await Swal.fire({
-                        title: 'Sin conexión al BCV',
-                        text: 'No se pudo obtener la tasa automática. Ingrese el precio del dólar manualmente:',
-                        input: 'text',
-                        inputLabel: 'Tasa BCV hoy (Ej: 60.5)',
-                        showCancelButton: false,
-                        allowOutsideClick: false,
-                        inputValidator: (value) => {
-                            if (!value || isNaN(value.replace(',','.'))) {
-                                return '¡Necesitas escribir un número válido!';
-                            }
-                        }
-                    });
+      <!-- NAV -->
+      <div class="footer-col">
+        <h4>Navegación</h4>
+        <ul>
+          <li><a href="#inicio">Inicio</a></li>
+          <li><a href="#oferta">Oferta Académica</a></li>
+          <li><a href="#innovacion">Innovación</a></li>
+          <li><a href="#cartelera">Cartelera</a></li>
+        </ul>
+      </div>
 
-                    if (manualRate.isConfirmed) {
-                        dollarRate = parseFloat(manualRate.value.replace(',','.'));
-                        display.className = "badge bg-warning text-dark fs-6";
-                        display.innerText = `Tasa Manual: Bs ${dollarRate.toFixed(2)}`;
-                    }
-                }
-            }
-            
-            // Actualizar precios visuales en todas las tablas
-            renderCatalog();
-            renderCredits();
-            renderCart();
-        }
+      <!-- LEVELS -->
+      <div class="footer-col">
+        <h4>Niveles</h4>
+        <ul>
+          <li><span>Educación Inicial</span></li>
+          <li><span>Educación Primaria</span></li>
+          <li><span>Media General</span></li>
+          <li><span>Bachillerato</span></li>
+        </ul>
+      </div>
 
-        // --- 4. NAVEGACIÓN ENTRE PESTAÑAS ---
-        function showSection(id) {
-            document.querySelectorAll('.section-card').forEach(sec => sec.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            
-            // Actualizar clase active en navbar
-            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-            event.currentTarget.classList.add('active'); // Corrección para seleccionar el link clickeado
-        }
+      <!-- CONTACT -->
+      <div class="footer-col">
+        <h4>Contacto</h4>
+        <div class="footer-contact-row">
+          <span class="fc-icon">📍</span>
+          <span class="fc-text">Av. Principal Los Guayos, Estado Carabobo, Venezuela</span>
+        </div>
+        <div class="footer-contact-row">
+          <span class="fc-icon">📞</span>
+          <span class="fc-text">0241-XXX-XXXX</span>
+        </div>
+        <div class="footer-contact-row">
+          <span class="fc-icon">✉️</span>
+          <span class="fc-text">ue.batallajunin@gmail.com</span>
+        </div>
+        <div class="footer-contact-row">
+          <span class="fc-icon">🕐</span>
+          <span class="fc-text">Lunes a Viernes: 7:00 am – 12:00 m</span>
+        </div>
+      </div>
 
-        // --- 5. LOGICA DE ALMACÉN ---
-        function updateStock(type) {
-            const name = document.getElementById('inv-product').value.trim();
-            const price = parseFloat(document.getElementById('inv-price').value) || 0;
-            const char = document.getElementById('inv-char').value.trim();
-            const qty = parseInt(document.getElementById('inv-qty').value);
-            const resp = document.getElementById('inv-resp').value.trim();
+    </div>
 
-            if(!name || !qty || !resp) return Swal.fire('Faltan Datos', 'Nombre, Cantidad y Responsable son obligatorios', 'warning');
+    <!-- ── CREDIT SECTION ── -->
+    <div class="footer-credit">
+      <a class="credit-card" href="https://wa.me/584244525765" target="_blank" rel="noopener" aria-label="Contactar a Orden y Gestión por WhatsApp">
+        <div class="credit-logo-wrap">
+          <img
+            src="orden-y-gestion-logo.png"
+            alt="Logo Orden y Gestión Los Guayos"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+          >
+          <div class="credit-logo-fallback" style="display:none;">O&amp;G<br>LOS<br>GUAYOS</div>
+        </div>
+        <div class="credit-text">
+          <strong>Plataforma desarrollada gracias a la mentoría digital y social de ORDEN Y GESTIÓN.</strong>
+          <p>
+            Organizamos hoy, transformamos el mañana.&ensp;|&ensp;
+            <a href="https://wa.me/584244525765" target="_blank" rel="noopener">📲 WhatsApp: 0424-4525765</a>
+          </p>
+        </div>
+      </a>
+      <p class="footer-copy">
+        © 2025 U.E. Batalla de Junín · Los Guayos, Carabobo · Venezuela. Todos los derechos reservados.
+      </p>
+    </div>
 
-            // Buscar si existe
-            let prod = products.find(p => p.name.toLowerCase() === name.toLowerCase());
-            
-            if (type === 'ingreso') {
-                if(prod) {
-                    prod.stock += qty;
-                    // Actualizamos precio solo si ingresaron uno nuevo mayor a 0
-                    if (price > 0) prod.price = price;
-                    if (char) prod.char = char;
-                } else {
-                    if (price <= 0) return Swal.fire('Error', 'Producto nuevo requiere precio', 'error');
-                    prod = { name, price, char, stock: qty };
-                    products.push(prod);
-                }
-            } else {
-                // Egreso
-                if(!prod) return Swal.fire('Error', 'El producto no existe', 'error');
-                if(prod.stock < qty) return Swal.fire('Stock Insuficiente', `Solo quedan ${prod.stock}`, 'error');
-                prod.stock -= qty;
-            }
+  </div>
+</footer>
 
-            // Registrar en Historial
-            movements.push({
-                date: new Date().toLocaleString(),
-                responsible: resp,
-                type: type.toUpperCase(),
-                qty,
-                product: name + (char ? ` (${char})` : '')
-            });
+<!-- ════════════════════════════════ JAVASCRIPT ════════════════════════════ -->
+<script>
+  /* ── Hamburger Menu ─────────────────────────────────── */
+  const hamburger  = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobile-menu');
 
-            saveData();
-            document.getElementById('inventory-form').reset();
-            Swal.fire({
-                icon: 'success',
-                title: type === 'ingreso' ? 'Entrada Registrada' : 'Salida Registrada',
-                showConfirmButton: false,
-                timer: 1500
-            });
-            renderCatalog();
-            renderMovements();
-        }
+  hamburger.addEventListener('click', () => {
+    const isOpen = mobileMenu.classList.toggle('open');
+    hamburger.classList.toggle('open', isOpen);
+    hamburger.setAttribute('aria-expanded', String(isOpen));
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  });
 
-        function renderMovements() {
-            const tbody = document.getElementById('movements-body');
-            // Mostrar últimos 50 movimientos, los más recientes primero
-            const recentMovements = movements.slice(-50).reverse();
-            
-            tbody.innerHTML = recentMovements.map(m => `
-                <tr>
-                    <td class="small">${m.date}</td>
-                    <td>${m.responsible}</td>
-                    <td><span class="badge ${m.type === 'INGRESO' ? 'bg-success' : 'bg-danger'}">${m.type}</span></td>
-                    <td>${m.qty}</td>
-                    <td>${m.product}</td>
-                </tr>
-            `).join('');
-        }
+  function closeMenu() {
+    mobileMenu.classList.remove('open');
+    hamburger.classList.remove('open');
+    hamburger.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
 
-        // --- 6. LÓGICA DE VENTAS (POS) ---
-        function renderCatalog() {
-            const search = document.getElementById('searchProduct').value.toLowerCase();
-            const tbody = document.getElementById('catalog-body');
-            
-            // Filtrar y ordenar alfabéticamente
-            const filtered = products
-                .filter(p => p.name.toLowerCase().includes(search))
-                .sort((a, b) => a.name.localeCompare(b.name));
+  /* ── Smooth Scroll ──────────────────────────────────── */
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', e => {
+      const target = document.querySelector(link.getAttribute('href'));
+      if (!target) return;
+      e.preventDefault();
+      const offset = 72;
+      const y = target.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    });
+  });
 
-            tbody.innerHTML = filtered.map(p => {
-                const bsPrice = (p.price * dollarRate).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                const isLowStock = p.stock <= 5;
-                
-                return `
-                <tr class="${isLowStock ? 'table-warning' : ''}">
-                    <td>
-                        <strong>${p.name}</strong><br>
-                        <small class="text-muted">${p.char || ''}</small>
-                    </td>
-                    <td class="${isLowStock ? 'stock-warning' : ''} text-center fw-bold">${p.stock}</td>
-                    <td>$${p.price.toFixed(2)}</td>
-                    <td class="text-primary fw-bold">Bs ${bsPrice}</td>
-                    <td>
-                        <button class="btn btn-sm btn-primary rounded-circle" onclick="addToCart('${p.name}')" ${p.stock <= 0 ? 'disabled' : ''}>
-                            <i class="bi bi-plus"></i>
-                        </button>
-                    </td>
-                </tr>`;
-            }).join('');
-        }
+  /* ── Navbar shadow on scroll ────────────────────────── */
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 20);
+  }, { passive: true });
 
-        function addToCart(prodName) {
-            const prod = products.find(p => p.name === prodName);
-            // Comprobar si ya está en el carrito
-            const itemInCart = cart.find(i => i.name === prodName);
-            
-            // Calcular cantidad actual en carrito para no vender de más
-            const currentQtyInCart = itemInCart ? itemInCart.qty : 0;
+  /* ── Scroll-reveal ──────────────────────────────────── */
+  const revealEls = document.querySelectorAll(
+    '.level-card, .innov-card, .bul-card, .value-item, .section-header'
+  );
 
-            if (currentQtyInCart >= prod.stock) {
-                return Swal.fire('Stock Lleno', 'No tienes más unidades disponibles', 'warning');
-            }
+  const ioOptions = { threshold: 0.12 };
+  let revealDelay = 0;
 
-            if (itemInCart) {
-                itemInCart.qty++;
-            } else {
-                cart.push({ ...prod, qty: 1 }); // Clonamos el objeto
-            }
-            renderCart();
-        }
+  const io = new IntersectionObserver((entries) => {
+    const visible = entries.filter(e => e.isIntersecting);
+    visible.forEach((entry, idx) => {
+      const el = entry.target;
+      const delay = idx * 0.07;
+      el.style.transition = `opacity .55s ease ${delay}s, transform .55s ease ${delay}s`;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+      }));
+      io.unobserve(el);
+    });
+  }, ioOptions);
 
-        function renderCart() {
-            const list = document.getElementById('cart-list');
-            let totalUSD = 0;
-
-            if (cart.length === 0) {
-                list.innerHTML = '<div class="text-center text-muted p-3">Carrito vacío</div>';
-            } else {
-                list.innerHTML = cart.map((item, index) => {
-                    totalUSD += item.price * item.qty;
-                    return `
-                    <li class="list-group-item d-flex justify-content-between align-items-center px-1">
-                        <div class="lh-1">
-                            <div class="fw-bold">${item.name}</div>
-                            <small class="text-muted">$${item.price} x ${item.qty}</small>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <span class="fw-bold me-2">$${(item.price * item.qty).toFixed(2)}</span>
-                            <button class="btn btn-sm text-danger" onclick="removeFromCart(${index})"><i class="bi bi-x-circle-fill"></i></button>
-                        </div>
-                    </li>`;
-                }).join('');
-            }
-            
-            document.getElementById('cart-total').innerText = `$${totalUSD.toFixed(2)}`;
-            const totalBs = (totalUSD * dollarRate).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            document.getElementById('cart-total-bs').innerText = `Bs ${totalBs}`;
-        }
-
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            renderCart();
-        }
-
-        function toggleCreditWarning() {
-            const method = document.getElementById('paymentMethod').value;
-            if (method === 'Fiado') {
-                Swal.fire('Modo Fiado', 'Recuerda llenar Nombre y Teléfono obligatoriamente.', 'info');
-            }
-        }
-
-        function processSale() {
-            if (cart.length === 0) return Swal.fire('Carrito vacío', 'Agregue productos antes de cobrar', 'warning');
-
-            const method = document.getElementById('paymentMethod').value;
-            const client = document.getElementById('clientName').value.trim();
-            const phone = document.getElementById('clientPhone').value.trim();
-            
-            if (method === 'Fiado' && (!client || !phone)) {
-                return Swal.fire('Datos Faltantes', 'Para dar CRÉDITO (Fiado) necesitas Nombre y Teléfono del cliente.', 'error');
-            }
-
-            // 1. Descontar Inventario
-            cart.forEach(item => {
-                const prod = products.find(p => p.name === item.name);
-                if(prod) prod.stock -= item.qty;
-            });
-
-            const totalUSD = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-
-            // 2. Registrar Venta General
-            const sale = {
-                date: new Date().toLocaleTimeString(),
-                seller: 'Cajero', // Se podría mejorar con un login
-                items: cart.map(i => `${i.name} (${i.qty})`).join(', '),
-                client: client || 'General',
-                phone: phone || '',
-                method: method,
-                total: totalUSD
-            };
-            sales.push(sale);
-
-            // 3. Si es Fiado, registrar deuda
-            if (method === 'Fiado') {
-                cart.forEach(item => {
-                    credits.push({
-                        debtor: client,
-                        phone: phone,
-                        product: item.name,
-                        qty: item.qty,
-                        valUSD: (item.price * item.qty),
-                        date: new Date().toLocaleDateString(),
-                        paid: false
-                    });
-                });
-                renderCredits();
-            }
-
-            // 4. Limpieza y UI
-            cart = [];
-            document.getElementById('sale-form').reset();
-            document.getElementById('paymentMethod').value = "Efectivo"; // Reset select
-            renderCart();
-            renderCatalog();
-            renderSalesTable();
-            saveData();
-
-            Swal.fire({
-                icon: 'success',
-                title: '¡Venta Procesada!',
-                text: `Cobrado: $${totalUSD.toFixed(2)}`,
-                timer: 2000,
-                showConfirmButton: false
-            });
-        }
-
-        // --- 7. CRÉDITOS Y FIADOS ---
-        function renderCredits() {
-            const tbody = document.getElementById('credits-body');
-            const activeCredits = credits.filter(c => !c.paid); // Solo mostrar pendientes
-            
-            if (activeCredits.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No hay deudas pendientes 🎉</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = activeCredits.map((c, i) => {
-                // Encontrar el índice real en el array original para poder marcarlo
-                const realIndex = credits.indexOf(c);
-                const debtBs = (c.valUSD * dollarRate).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-                return `
-                <tr>
-                    <td class="fw-bold text-uppercase">${c.debtor}</td>
-                    <td><a href="https://wa.me/58${c.phone.substring(1)}" target="_blank" class="text-decoration-none"><i class="bi bi-whatsapp text-success"></i> ${c.phone}</a></td>
-                    <td>${c.product} (x${c.qty})</td>
-                    <td>$${c.valUSD.toFixed(2)}</td>
-                    <td class="text-danger fw-bold">Bs ${debtBs}</td>
-                    <td><span class="badge bg-warning text-dark">Pendiente</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-success" onclick="markPaid(${realIndex})"><i class="bi bi-check-lg"></i> Pagar</button>
-                    </td>
-                </tr>`;
-            }).join('');
-        }
-
-        function markPaid(index) {
-            Swal.fire({
-                title: '¿Confirmar Pago?',
-                text: `El cliente ${credits[index].debtor} está pagando esta deuda.`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, registrar pago'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    credits[index].paid = true;
-                    credits[index].paidDate = new Date().toLocaleString();
-                    saveData();
-                    renderCredits();
-                    Swal.fire('Pagado', 'Deuda saldada correctamente', 'success');
-                }
-            });
-        }
-
-        // --- 8. REPORTES Y CIERRE ---
-        function renderSalesTable() {
-            const tbody = document.getElementById('sales-body');
-            // Ventas del día (últimas primero)
-            tbody.innerHTML = sales.slice().reverse().map(s => `
-                <tr>
-                    <td>${s.date}</td>
-                    <td>${s.seller}</td>
-                    <td class="small text-truncate" style="max-width: 150px;">${s.items}</td>
-                    <td>${s.client}</td>
-                    <td><span class="badge bg-light text-dark border">${s.method}</span></td>
-                    <td class="fw-bold">$${s.total.toFixed(2)}</td>
-                </tr>
-            `).join('');
-        }
-
-        function exportTableToExcel(tableId, filename) {
-            let table = document.getElementById(tableId);
-            let wb = XLSX.utils.table_to_book(table);
-            XLSX.writeFile(wb, `${filename}_${getFormattedDate()}.xlsx`);
-        }
-
-        function exportSales() {
-            if(sales.length === 0) return Swal.fire('Info', 'No hay ventas para exportar', 'info');
-            const ws = XLSX.utils.json_to_sheet(sales);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Ventas");
-            XLSX.writeFile(wb, `Ventas_${getFormattedDate()}.xlsx`);
-        }
-
-        function exportInventory() {
-            const ws = XLSX.utils.json_to_sheet(products);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Inventario");
-            XLSX.writeFile(wb, `Inventario_${getFormattedDate()}.xlsx`);
-        }
-
-        function getFormattedDate() {
-            const d = new Date();
-            return `${d.getDate()}-${d.getMonth()+1}-${d.getFullYear()}`;
-        }
-
-        function closeRegister() {
-            const resp = document.getElementById('close-resp').value;
-            if (!resp) return Swal.fire('Requiere Firma', 'Escriba el nombre del responsable para cerrar.', 'error');
-
-            Swal.fire({
-                title: '¿Cerrar Caja Definitivamente?',
-                text: "Esto exportará el Excel de ventas y limpiará la lista de hoy.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                confirmButtonText: 'SÍ, CERRAR Y LIMPIAR'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    exportSales(); // Descarga automática
-                    
-                    // Limpieza
-                    sales = []; 
-                    document.getElementById('close-resp').value = '';
-                    saveData();
-                    renderSalesTable();
-                    
-                    Swal.fire('Turno Cerrado', `Cierre realizado por: ${resp}`, 'success');
-                }
-            });
-        }
-
-        // --- 9. PERSISTENCIA DE DATOS (LocalStorage) ---
-        function saveData() {
-            localStorage.setItem('nexus_products', JSON.stringify(products));
-            localStorage.setItem('nexus_movements', JSON.stringify(movements));
-            localStorage.setItem('nexus_sales', JSON.stringify(sales));
-            localStorage.setItem('nexus_credits', JSON.stringify(credits));
-        }
-    </script>
+  revealEls.forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(22px)';
+    io.observe(el);
+  });
+</script>
 </body>
 </html>
